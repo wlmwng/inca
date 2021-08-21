@@ -25,6 +25,7 @@ requirements = [
     "scipy",
     "selenium",
     "twython",
+    "twarc",
     "nltk",
     "tqdm",
     "pattern",
