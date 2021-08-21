@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 requirements = [
     "wheel",
-    "celery",
+    "celery>3.1,<4.0",
     "cytoolz",
     "colorama",
     "tqdm",
@@ -28,7 +28,7 @@ requirements = [
     "nltk",
     "tqdm",
     "pattern",
-    "praw"
+    "praw",
 ]
 
 setup(
