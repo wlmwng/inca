@@ -101,7 +101,9 @@ def doctype_first(doctype, num=1, by_field="META.ADDED", query=None):
         return []
 
     body = {
-        "sort": [{by_field: {"order": "asc"}}],
+        # https://stackoverflow.com/questions/17051709/no-mapping-found-for-field-in-order-to-sort-on-in-elasticsearch
+        # https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-sort.html#_ignoring_unmapped_fields
+        "sort": [{by_field: {"order": "asc", "unmapped_type": "date"}}],
         "size": num,
         "query": {"term": {"doctype": doctype}},
     }
