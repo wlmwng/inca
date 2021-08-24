@@ -22,7 +22,7 @@ class twitter(Client):
 
     @elasticsearch_required
     def add_application(self, appname="default"):
-        """Add a Twitter app to generate credentials """
+        """Add a Twitter app to generate credentials"""
 
         app_prompt = {
             "header": "Add Twitter application",
@@ -74,7 +74,7 @@ class twitter(Client):
 
     @elasticsearch_required
     def add_credentials(self, appname="default"):
-        """Add credentials to a specified app """
+        """Add credentials to a specified app"""
 
         logger.info("Adding credentials to {appname}".format(**locals()))
 
