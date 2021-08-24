@@ -122,6 +122,8 @@ class twitter2_timeline(twitter2):
         credentials,
         screen_name,
         force=False,
+        since_id=None,
+        until_id=None,
         start_time=datetime.datetime.now(datetime.timezone.utc).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
@@ -135,11 +137,42 @@ class twitter2_timeline(twitter2):
         self.doctype = "tweets2"
         self.version = "0.1"
         self.functiontype = "twitter2_client"
-        self.date = (datetime.datetime(2021, 8, 21, 0, 0, 0, 0, datetime.timezone.utc),)
+        self.date = datetime.datetime(2021, 8, 21, 0, 0, 0, 0, datetime.timezone.utc)
 
         api = self._get_client(credentials=dotkeys(credentials, "_source.credentials"))
 
         if not force:
+
+            # The purpose of setting 'since_id' is to conserve API resources.
+            # Only new tweets which did not exist at the time of previous retrieval will be collected.
+            # If 'since_id' is not set, then the API will return all tweets by the account;
+            # i.e., the response will return all tweets, even if they had already been collected by INCA.
+
+            # 'since_id': tweets older than this id will not be included in the response.
+            # 'doctype_first': the oldest doc in INCA corresponds with the most recent tweet in INCA.
+
+            # Example:
+            # INCA collects an account's tweets on June 15, 2020.
+            # At this time, the account contains T1 (posted on May 1), T2 (May 15), and T3 (May 31).
+            # INCA stores each tweet as a doc in ES (doc['_source']).
+            # T3, T2, and T1 are stored by INCA in that order.
+            # As a result, doctype_first(...) will return the id of T3 (most recent tweet, oldest doc)
+            # rather than the id of T1 (oldest tweet, newest doc).
+
+            # The account adds two tweets after June 15, 2020.
+            # At this time, the timeline contains T1, T2, T3, T4 (June 2), and T5 (June 5).
+            # doctype_first(...) sets 'since_id' set to the id of T3.
+            # As a result, only tweets posted after T3 (i.e., T5 and T4) are included in the response.
+            # doctype_first(...) will then set 'since_id' to the id of T5 in a future retrieval.
+
+            # 'until_id' is set to None (similar to max_id in Twitter API v1.1)
+            # The Twitter API v2 provides it for pagination purposes,
+            # but no value is needed since twarc already handles pagination (and rate limiting).
+
+            # References:
+            # https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/guides/working-with-timelines
+            # https://stackoverflow.com/questions/6412188/what-exactly-does-since-id-and-max-id-mean-in-the-twitter-api
+
             since_id = doctype_first(
                 doctype="tweets2", query="author.username:" + screen_name
             )
@@ -153,16 +186,17 @@ class twitter2_timeline(twitter2):
                 logger.info("settings since_id to {since_id}".format(**locals()))
         try:
             # the search_all method calls the full-archive search endpoint
-            # returns a paginated generator
+            # and returns a paginated generator
             response = api.search_all(
                 query=f"from:{screen_name}",
+                since_id=since_id,
+                until_id=until_id,
                 start_time=start_time,
                 end_time=end_time,
-                since_id=since_id,
                 max_results=100,
             )
 
-            # collect the hydrated tweets returned by the endpoint into a list
+            # collect the hydrated tweets returned by the endpoint
             # hydration is done on a page-by-page basis
             # (https://twarc-project.readthedocs.io/en/latest/api/expansions/)
             tweets = []
@@ -193,4 +227,4 @@ class twitter2_timeline(twitter2):
             )
 
         except Exception as e:
-            logger.error(f"Unhandled exception: {e}")  # , exc_info=True
+            logger.error(f"Unhandled exception: {e}")
