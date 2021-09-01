@@ -209,8 +209,6 @@ imagehash==4.2.0
     # via
     #   -r requirements.in
     #   inca
-file:///home/wailam/Documents/github/inca-dflt
-    # via -r requirements.in
 ipykernel==5.4.3
     # via
     #   -r requirements.in
