@@ -74,6 +74,7 @@ import datetime
 from . import processing  # helps celery recognize the processing tasks
 from . import scrapers  # helps celery recognize the scraping tasks
 from . import rssscrapers
+from . import usmedia_scrapers
 from . import clients  # helps celery recognize client tasks
 from . import analysis  # helps celery recognize analysis tasks
 from . import importers_exporters  # helps celery recognize import/export tasks
@@ -101,6 +102,9 @@ class Inca:
 
     Rssscrapers
         Same as Scrapers, but based on the websites' RSS feeds.
+
+    Usmedia_scrapers
+        Same as Scrapers, but customized for us-right-media project.
 
     Clients
         API-clients to get data from various endpoints. You can start using client
@@ -144,6 +148,7 @@ class Inca:
         self._construct_tasks("clients")
         self._construct_tasks("importers_exporters")
         self._construct_tasks("rssscrapers")
+        self._construct_tasks("usmedia_scrapers")
 
         if verbose:
             logger.setLevel("INFO")
@@ -163,7 +168,12 @@ class Inca:
         pass
 
     class rssscrapers:
-        """RSS-based crapers for various (news) outlets"""
+        """RSS-based scrapers for various (news) outlets"""
+
+        pass
+
+    class usmedia_scrapers:
+        """US media scrapers for various (news) outlets"""
 
         pass
 
@@ -307,6 +317,8 @@ class Inca:
                     docstring = self._taskmaster.tasks[k].get.__doc__
                 elif function == "rssscrapers":
                     docstring = self._taskmaster.tasks[k].get.__doc__
+                elif function == "usmedia_scrapers":
+                    docstring = self._taskmaster.tasks[k].get.__doc__
                 elif function == "processing":
                     docstring = self._taskmaster.tasks[k].process.__doc__
                 elif function == "importers_exporters":
@@ -382,7 +394,7 @@ def commandline():
         dest="noprompt",
         default=False,
         action="store_true",
-        help="Never prompt users (usually leads to failure), usefull for headles environments and cronjobs",
+        help="Never prompt users (usually leads to failure), useful for headles environments and cronjobs",
     )
 
     options, args = parser.parse_args()
@@ -409,7 +421,7 @@ def commandline():
         tasktype_ob = getattr(inca, tasktype)
     except:
         print(
-            "Tasktype '{tasktype}' not found! Should be 'rssscrapers', 'scrapers' or 'processing'".format(
+            "Tasktype '{tasktype}' not found! Should be 'rssscrapers', 'usmedia_scrapers', 'scrapers' or 'processing'".format(
                 **locals()
             )
         )
