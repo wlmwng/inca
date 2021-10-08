@@ -5,7 +5,9 @@ from .database import client as _client
 from .database import scroll_query as _scroll_query
 from .database import elastic_index as _elastic_index
 from .database import DATABASE_AVAILABLE as _DATABASE_AVAILABLE
-from .database import delete_doctype, delete_document, insert_document, insert_documents
+from .database import check_exists, delete_doctype, delete_document, \
+                      get_document, insert_document, insert_documents, \
+                      update_document
 from .database import deduplicate, reparse
 import logging as _logging
 from .basic_utils import dotkeys as _dotkeys
