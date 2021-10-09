@@ -3,7 +3,6 @@ import logging
 import time
 
 from bs4 import BeautifulSoup
-from inca.core.database import check_exists
 from inca.scrapers.usmedia_scraper import usmedia
 
 logger = logging.getLogger("INCA")
