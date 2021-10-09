@@ -104,7 +104,26 @@ class Inca:
         Same as Scrapers, but based on the websites' RSS feeds.
 
     Usmedia_scrapers
-        Same as Scrapers, but customized for us-right-media project.
+        Each website's scraper inherits from the usmedia_scraper class.
+        Inheritance allows the website-specific scrapers to share
+        the same default variables and functions defined in its parent class.
+        If needed, a default can be overwritten by defining
+        a website-specific version of it within the particular website's class.
+
+        usage:
+            
+            # keys are based on info retrieved from the Media Cloud API
+            url_dict = {'url_id': str
+                        'outlet': str
+                        'publish_date': datetime
+                        'title': str
+                        'ap_syndicated': bool
+                        'themes': str
+                        'url': str
+                        'alt_url': str}
+              
+            inca.usmedia_scrapers.<scraper>(url_info=url_dict) 
+        
 
     Clients
         API-clients to get data from various endpoints. You can start using client
