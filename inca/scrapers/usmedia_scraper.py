@@ -200,7 +200,7 @@ class usmedia(Scraper):
         content = init.retrieve_content()
         t1 = time.time()
         content.TIME_TAKEN = t1-t0
-
+        content.resolved_text = ""
         doc = content.json_serializeable()
 
         yield doc

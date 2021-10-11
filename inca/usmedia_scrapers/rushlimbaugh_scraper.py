@@ -68,7 +68,7 @@ class rushlimbaugh(usmedia):
             content = self.patch_retrieved(content)
         t1 = time.time()
         content.TIME_TAKEN = t1-t0
-
+        content.resolved_text = ""
         doc = content.json_serializeable()
 
         yield doc
