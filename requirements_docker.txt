@@ -55,7 +55,6 @@ hyperframe==5.2.0
 hyperlink==21.0.0
 idna==2.8
 ImageHash==3.7
--e git+https://github.com/wlmwng/inca-dev.git@714ddfa8d0412a2ee1f8b1b58afb7d0934c4f588#egg=inca
 incremental==21.3.0
 ipython==7.9.0
 ipython-genutils==0.2.0
