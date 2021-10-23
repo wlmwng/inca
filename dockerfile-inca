@@ -2,12 +2,13 @@ FROM jupyter/datascience-notebook:2021-10-11
 
 USER root
 
+# Pillow: https://pillow.readthedocs.io/en/latest/installation.html#external-libraries
+# Scipy: https://forums.developer.nvidia.com/t/pip-install-something-but-error-with-could-not-find-a-satisfies-version/66300/3
 RUN apt-get update && \
     apt-get install -y \
-    python3-pip \
-    python-dev \
-    python3.8-dev \
+    python3-dev \
     libpython3-dev \
+    python3.8-dev \
     libpython3.8-dev \
     libxml2-dev \
     libxslt-dev \
@@ -27,7 +28,11 @@ RUN apt-get update && \
     python3-tk \
     libharfbuzz-dev \
     libfribidi-dev \
-    libxcb1-dev && \
+    libxcb1-dev \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    gfortran && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Fix compilation errors by revising paths in the container's header files
@@ -49,21 +54,11 @@ COPY ./revised_header_files/pyconfig.h /usr/include/python3.8
 #   compilation terminated.
 #   error: command '/opt/conda/bin/x86_64-conda-linux-gnu-cc' failed with exit status 
 
-# changed this line in pyconfig.h:
+# changed the 2nd line below in pyconfig.h:
 # if defined(__x86_64__) && defined(__LP64__)
 #  include </usr/include/x86_64-linux-gnu/python3.8/pyconfig.h>
 
-
 USER $NB_UID
-# https://stackoverflow.com/a/57233305
-# adding ENV doesn't seem to work in actual container
-# ENV PATH "$PATH:/home/jovyan/.local/bin"
 
 WORKDIR /home/jovyan/work
-
-# error installing INCA: downgrade setuptools
-# anyjson setup command: use_2to3 is invalid
-# https://stackoverflow.com/a/69100830
-RUN pip3 install setuptools==57.5.0
-
 
