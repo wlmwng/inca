@@ -205,7 +205,7 @@ def doctype_fields(doctype):
     )["hits"]["total"]
     mappings = (
         _client.indices.get_mapping(_elastic_index)
-        .get(_elastic_index, {})
+        .popitem()[1]
         .get("mappings", {})
         .get("doc", {})
         .get("properties", {})
