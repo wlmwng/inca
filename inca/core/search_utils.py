@@ -111,14 +111,7 @@ def doctype_first(doctype, num=1, by_field="META.ADDED", query=None):
         body["query"] = {"query_string": {"query": query}}
 
     docs = (
-        _client.search(
-            index=_elastic_index,
-            body={
-                "sort": [{by_field: {"order": "asc"}}],
-                "size": num,
-                "query": {"term": {"doctype": doctype}},
-            },
-        )
+        _client.search(index=_elastic_index, body=body)
         .get("hits", {})
         .get("hits", [""])
     )
@@ -157,14 +150,7 @@ def doctype_last(doctype, num=1, by_field="META.ADDED", query=None):
         body["query"] = {"query_string": {"query": query}}
 
     docs = (
-        _client.search(
-            index=_elastic_index,
-            body={
-                "sort": [{by_field: {"order": "desc"}}],
-                "size": num,
-                "query": {"term": {"doctype": doctype}},
-            },
-        )
+        _client.search(index=_elastic_index, body=body)
         .get("hits", {})
         .get("hits", [""])
     )
