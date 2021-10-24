@@ -39,6 +39,7 @@ try:
         ),
         timeout=60,
     )  # should be updated to reflect config
+
     elastic_index = config.get("elasticsearch", "document_index")
     DATABASE_AVAILABLE = True
     check = int(client.info()["version"]["number"][0])
@@ -169,7 +170,7 @@ def update_document(document, force=False, retry=0, max_retries=10):
 
 
 def delete_document(document_id):
-    """ delete a document
+    """delete a document
 
     Parameters
     ----
@@ -207,7 +208,7 @@ def delete_doctype(doctype):
 
 
 def insert_document(document, custom_identifier=""):
-    """ Insert a new document into the default index """
+    """Insert a new document into the default index"""
     document = _remove_dots(document)
 
     # Determine document type for Elasticsearch
@@ -249,7 +250,7 @@ def insert_document(document, custom_identifier=""):
 
 
 def insert_documents(documents, identifiers="id"):
-    """ Insert a batch of documents in ES
+    """Insert a batch of documents in ES
 
     Parameters
     ----
@@ -322,7 +323,7 @@ def insert_documents(documents, identifiers="id"):
 
 
 def update_or_insert_document(document, force=False, use_url=False):
-    """ Check whether a document exists, update if so
+    """Check whether a document exists, update if so
     use_url: if set to True it is additionally checked whether the url already exists. In case either only URL or only id exists the document is not inserted"""
     if "_id" in document.keys():
         exists, _document = check_exists(document["_id"])
@@ -393,8 +394,8 @@ def remove_field(query, field):
 
 class bulk_upsert(Task):
     """Processers can generate far more updates than elasticsearch wants to handle.
-       Bulk_upsert reduces the load on elasticsearch by enabeling multiple documents
-       to be updated together, reducing the amount of queries.
+    Bulk_upsert reduces the load on elasticsearch by enabeling multiple documents
+    to be updated together, reducing the amount of queries.
     """
 
     def run(self, documents):
@@ -403,7 +404,7 @@ class bulk_upsert(Task):
 
 
 def _remove_dots(document):
-    """ elasticsearch is allergic to dots like '.' in keys.
+    """elasticsearch is allergic to dots like '.' in keys.
     if you're not careful, it may choke!
     """
     for k, v in document.items():
@@ -495,10 +496,10 @@ def create_repository(location):
     -----
     The repository location must match the `path.repo` argument in the
     `elasticsearch.yml` file, generally located in the .../elasticsearch/config
-    path or, alternatively, in the /etc/elasticsearch path. Elasticsearch must be restarted 
-    after the `path.repo` is set or changed. In case you are having trouble with 
-    starting elasticsearch again, run 
-    
+    path or, alternatively, in the /etc/elasticsearch path. Elasticsearch must be restarted
+    after the `path.repo` is set or changed. In case you are having trouble with
+    starting elasticsearch again, run
+
     ```bash
     sudo chown elasticsearch.elasticsearch /path/to/inca/backup
     ```
@@ -595,7 +596,7 @@ def deduplicate(
 ):
     """
     Takes a document generator `g` as input and lists (if `dryrun=True`)
-    or remove (if `dryrun=False`) duplicate documents. 
+    or remove (if `dryrun=False`) duplicate documents.
     With ```check_keys = ['key1', 'key2', ...] ``` you can specify the keys
     on which the documents are compared.
 
@@ -677,7 +678,7 @@ def reparse(g, f, force=False):
     """
     Takes a document generator `g` as reparses the `htmlsource` key using
     a parse function f taken from an INCA-scraper.
-  
+
     In the current implementation, only the text field is considered.
     By default, the text field is only updated if it was empty.
 
@@ -688,8 +689,8 @@ def reparse(g, f, force=False):
     Example usage:
     ```
     from inca.rssscrapers import news_scraper
-    f = news_scraper.nu.parsehtml 
-   
+    f = news_scraper.nu.parsehtml
+
     g = myinca.database.document_generator('doctype:"nu" AND publication_date:[2017-01-01 TO 2017-03-15]')
     myinca.database.reparse(g, f, force = False)
     ```
