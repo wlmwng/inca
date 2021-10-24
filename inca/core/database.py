@@ -30,23 +30,15 @@ logger = logging.getLogger("INCA")
 logging.getLogger("elasticsearch").setLevel(logging.CRITICAL)
 
 try:
-
-    dependencies_type = config.get("inca", "dependencies")
-
-    if dependencies_type == "standard":
-        client = Elasticsearch(
-            host=config.get("elasticsearch", "%s.host" % dependencies_type),
-            port=int(config.get("elasticsearch", "%s.port" % dependencies_type)),
-            timeout=60,
-        )
-
-    elif dependencies_type == "docker":
-        client = Elasticsearch(
-            hosts=[
-                {"host": config.get("elasticsearch", "%s.service" % dependencies_type)}
-            ],
-            timeout=60,
-        )
+    client = Elasticsearch(
+        host=config.get(
+            "elasticsearch", "%s.host" % config.get("inca", "dependencies")
+        ),
+        port=int(
+            config.get("elasticsearch", "%s.port" % config.get("inca", "dependencies"))
+        ),
+        timeout=60,
+    )  # should be updated to reflect config
 
     elastic_index = config.get("elasticsearch", "document_index")
     DATABASE_AVAILABLE = True
