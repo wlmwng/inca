@@ -168,4 +168,8 @@ wcwidth==0.1.7
 websocket-client==1.2.1
 Werkzeug==0.11.10
 zc.lockfile==2.0
+<<<<<<< HEAD
 zope.interface==5.4.0
+=======
+zope.interface==5.4.0
+>>>>>>> usrightmedia/base
