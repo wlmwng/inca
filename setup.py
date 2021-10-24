@@ -6,17 +6,17 @@ requirements = [
     "cytoolz",
     "colorama",
     "tqdm",
-    "elasticsearch>=6",
+    "elasticsearch>=6.0.0,<7.0.0",
     "feedparser",
     "httplib2",
     "imagehash",
     "loremipsum",
     "lxml",
-    "requests<3.0.0,>=2.13.0",
+    "requests",
     "statsmodels",
     "pandas",
-    "pillow==6.2.0",
-    "gensim>3.4",
+    "pillow",
+    "gensim",
     "oauth2client",
     "matplotlib",
     "networkx",
@@ -25,11 +25,11 @@ requirements = [
     "scipy",
     "selenium",
     "twython",
+    "twarc",
     "nltk",
     "tqdm",
     "pattern",
     "praw",
-    "nl_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/nl_core_news_sm-2.1.0/nl_core_news_sm-2.1.0.tar.gz",
 ]
 
 setup(
@@ -47,4 +47,3 @@ setup(
     dependency_links=[],
     zip_safe=False,
 )
-

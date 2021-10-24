@@ -1,0 +1,64 @@
+FROM jupyter/datascience-notebook:2021-10-11
+
+USER root
+
+# Pillow: https://pillow.readthedocs.io/en/latest/installation.html#external-libraries
+# Scipy: https://forums.developer.nvidia.com/t/pip-install-something-but-error-with-could-not-find-a-satisfies-version/66300/3
+RUN apt-get update && \
+    apt-get install -y \
+    python3-dev \
+    libpython3-dev \
+    python3.8-dev \
+    libpython3.8-dev \
+    libxml2-dev \
+    libxslt-dev \
+    libssl-dev \
+    libffi-dev \
+    build-essential \
+    libmysqlclient-dev \
+    libtiff5-dev \
+    libjpeg8-dev \
+    libopenjp2-7-dev \
+    zlib1g-dev \
+    libfreetype6-dev \ 
+    liblcms2-dev \
+    libwebp-dev \
+    tcl8.6-dev \
+    tk8.6-dev \
+    python3-tk \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libxcb1-dev \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    gfortran && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Fix compilation errors by revising paths in the container's header files
+# https://gcc.gnu.org/onlinedocs/cpp/Search-Path.html
+# https://stackoverflow.com/a/40896066
+COPY ./revised_header_files/mysql_com.h /usr/include/mysql
+# # changed this line in mysql_com.h:
+# #include "mysql/udf_registration_types.h" -> #include "udf_registration_types.h"
+
+COPY ./revised_header_files/mysql.h /usr/include/mysql
+# # changed this line in mysql.h:
+# #include "mysql/client_plugin.h" -> #include "client_plugin.h"
+
+COPY ./revised_header_files/pyconfig.h /usr/include/python3.8
+# due to this error:
+# /usr/include/python3.8/pyconfig.h:3:12: fatal error: x86_64-linux-gnu/python3.8/pyconfig.h: No such file or directory
+#       3 | #  include <x86_64-linux-gnu/python3.8/pyconfig.h>
+#         |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#   compilation terminated.
+#   error: command '/opt/conda/bin/x86_64-conda-linux-gnu-cc' failed with exit status 
+
+# changed the 2nd line below in pyconfig.h:
+# if defined(__x86_64__) && defined(__LP64__)
+#  include </usr/include/x86_64-linux-gnu/python3.8/pyconfig.h>
+
+USER $NB_UID
+
+WORKDIR /home/jovyan/work
+
