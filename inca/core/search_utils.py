@@ -103,7 +103,7 @@ def doctype_first(doctype, num=1, by_field="META.ADDED", query=None):
         return []
 
     body = {
-        "sort": [{by_field: {"order": "asc"}}],
+        "sort": [{by_field: {"order": "asc", "unmapped_type": "date"}}],
         "size": num,
         "query": {"term": {"doctype": doctype}},
     }
@@ -142,7 +142,7 @@ def doctype_last(doctype, num=1, by_field="META.ADDED", query=None):
         return []
 
     body = {
-        "sort": [{by_field: {"order": "desc"}}],
+        "sort": [{by_field: {"order": "desc", "unmapped_type": "date"}}],
         "size": num,
         "query": {"term": {"doctype": doctype}},
     }
