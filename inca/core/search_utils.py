@@ -83,7 +83,10 @@ def document_generator(query="*"):
             _logger.warning("Unknown input")
             es_query = False
         if es_query:
-            # total = _client.search(_elastic_index, body=es_query, size=0)['hits']['total']
+            total = _client.search(_elastic_index, body=es_query, size=0)["hits"][
+                "total"
+            ]
+            _logger.info(f"{total} documents match the query")
             for doc in _scroll_query(es_query):
                 yield doc
 
