@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-from ..core.processor_class import Processer
-from ..core.basic_utils import dotkeys
 import logging
 import re
 import sys
 
+from bs4 import BeautifulSoup
+
+from ..core.basic_utils import dotkeys
+from ..core.processor_class import Processer
 
 logger = logging.getLogger("INCA")
 
@@ -19,8 +21,8 @@ except ImportError:
     pass
 
 
-from sys import maxunicode
 import unicodedata
+from sys import maxunicode
 
 
 class clean_whitespace(Processer):
@@ -64,19 +66,49 @@ class njr(Processer):
 
 
 class remove_punctuation(Processer):
-    """removes all punctuation. "Bla. Bla bla+" -> "Bla Bla bla". "Willem-Alexander" -> WillemAlexander"""
+    """removes all punctuation. "Bla. Bla bla+" -> "Bla Bla bla". "Willem-Alexander" -> Willem Alexander"""
 
-    tbl = dict.fromkeys(
-        i for i in range(maxunicode) if unicodedata.category(chr(i)).startswith("P")
+    # punctuation marks are re-assigned with None
+    # this means that if a punctuation character is matched, it won't be replaced by another character
+    punc_dict = dict.fromkeys(
+        (i for i in range(maxunicode) if unicodedata.category(chr(i)).startswith("P")),
+        None,
     )
+
+    # https://jkorpela.fi/dashes.html
+    hyphen_codes = [
+        45,
+        126,
+        1418,
+        1470,
+        8208,
+        8209,
+        8210,
+        8211,
+        8212,
+        8213,
+        8275,
+        8315,
+        8331,
+        8722,
+        11834,
+        11835,
+        65112,
+        65123,
+        65293,
+    ]
+
+    # hyphens are re-assigned to " " (and not None) so that hyphenated words are not smushed together
+    hyphen_dict = {i: " " for i in hyphen_codes}
+    punc_dict.update(hyphen_dict)  # in-place
 
     def process(self, document_field):
         """punctuation removed"""
-        return (
-            document_field.replace("`", "")
-            .replace("´", "")
-            .translate(remove_punctuation.tbl)
-        )
+        doc = document_field
+        doc = doc.replace("`", "").replace("´", "")
+        doc = doc.replace(f"{chr(8217)}s", " ").replace("'s", " ")  # possessives
+        doc = doc.translate(self.punc_dict)
+        return doc
 
 
 class lowercase(Processer):
@@ -167,9 +199,9 @@ class multireplace(Processer):
 
 class remove_stopwords(Processer):
     """Similar to removing all punctuation, but expects either the keyword 'stopwords_list' with a list of words or the keyword 'language' as input (the latter case uses the nltk stopword list for this language). During the process, text also gets lowercased
-Example for stopwords_list Dutch language: 
-import requests
-stopwords = requests.get("https://raw.githubusercontent.com/stopwords-iso/stopwords-nl/master/stopwords-nl.txt").text.splitlines()"""
+    Example for stopwords_list Dutch language:
+    import requests
+    stopwords = requests.get("https://raw.githubusercontent.com/stopwords-iso/stopwords-nl/master/stopwords-nl.txt").text.splitlines()"""
 
     def process(self, document_field, stopwords):
         """removes stopwords. `stopwords' can be either a language name ('dutch') or a list of stopwords"""
@@ -239,3 +271,13 @@ class lower_punct(Processer):
             .translate(remove_punctuation.tbl)
             .lower()
         )
+
+
+class remove_html_tags(Processer):
+    """remove HTML tags"""
+
+    def process(self, document_field):
+        """remove HTML tags"""
+        soup = BeautifulSoup(document_field, "html.parser")
+        doc = soup.get_text(separator=" ")
+        return doc
