@@ -71,14 +71,14 @@ class softcosine_similarity(Analysis):
         keyword_source/_target = optional: specify keywords that need to be present in the textfield; list or string (lowercase)
         keyword_source/_target_must = optional: In case of a list, do all keywords need to appear in the text (logical AND) or does at least one of the words need to be in the text (logical OR). Defaults to False (logical OR)
         condition_source/target = optional: supply the field and its value as a dict as a condition for analysis, e.g. {'topic':1} (defaults to None)
-        days_before = days target is before source (e.g. 2); days_after = days target is after source (e.g. 2) -> either both or none should be supplied. Additionally, merge_weekend = True will merge articles published on Saturday and Sunday. 
+        days_before = days target is before source (e.g. 2); days_after = days target is after source (e.g. 2) -> either both or none should be supplied. Additionally, merge_weekend = True will merge articles published on Saturday and Sunday.
         threshold = threshold to determine at which point similarity is sufficient; if supplied only the rows who pass it are included in the dataset
         from_time, to_time = optional: specifying a date range to filter source and target articles. Supply the date in the yyyy-MM-dd format.
         to_csv = if True save the resulting data in a csv file - otherwise a pandas dataframe is returned
         destination = optional: where should the resulting datasets be saved? (defaults to 'comparisons' folder)
         to_pajek = if True save - in addition to csv/pickle - the result (source, target and similarity score) as pajek file to be used in the Infomap method (defaults to False) - not available in combination with days_before/days_after parameters
-        filter_above = Words occuring in more than this fraction of all documents will be filtered
-        filter_below = Words occuring in less than this absolute number of docments will be filtered
+        filter_above = Words occurring in more than this fraction of all documents will be filtered
+        filter_below = Words occurring in less than this absolute number of docments will be filtered
         """
         now = time.localtime()
 
@@ -91,8 +91,10 @@ class softcosine_similarity(Analysis):
         try:
             softcosine_model = gensim.models.Word2Vec.load(path_to_model)
         except:
-            softcosine_model = gensim.models.keyedvectors.KeyedVectors.load_word2vec_format(
-                path_to_model, binary=True
+            softcosine_model = (
+                gensim.models.keyedvectors.KeyedVectors.load_word2vec_format(
+                    path_to_model, binary=True
+                )
             )
 
         logger.info("Done")
@@ -223,7 +225,9 @@ class softcosine_similarity(Analysis):
             )
         )
         # don't drop tokens after 100,000 since rarer terms can add specificity for news event detection
-        dictionary.filter_extremes(no_below=filter_below, no_above=filter_above, keep_n=None, keep_n=None)
+        dictionary.filter_extremes(
+            no_below=filter_below, no_above=filter_above, keep_n=None, keep_tokens=None
+        )
         logger.info("Preparing tfidf model")
         tfidf = TfidfModel(dictionary=dictionary)
         logger.info("Preparing soft cosine similarity matrix")
@@ -316,9 +320,7 @@ class softcosine_similarity(Analysis):
                 # A sliding window cuts the documents into groups that should be compared to each other based on their publication dates. A list of source documents published on the reference date is created. For each of the target dates in the window, the source list is compared to the targets, the information is put in a dataframe, and the dataframe is added to a list. This process is repeated for each window. We end up with a list of dataframes, which are eventually merged together into one dataframe.
 
                 len_window = days_before + days_after + 1
-                source_pos = (
-                    days_before
-                )  # source position is equivalent to days_before (e.g. 2 days before, means 3rd day is source with the index position [2])
+                source_pos = days_before  # source position is equivalent to days_before (e.g. 2 days before, means 3rd day is source with the index position [2])
                 n_window = 0
 
                 for e in tqdm(self.window(grouped_query, n=len_window)):
@@ -483,11 +485,11 @@ class softcosine_similarity(Analysis):
                 df["source_doctype"] = df["source"].map(source_dict2)
                 df["target_doctype"] = df["target"].map(target_dict2)
                 # pandas version which was used to develop this code required df.set_index()
-                # the code breaks with a newer version (pandas 1.2.2+?) due to a KeyError 'source' in L529
-                    # G = nx.from_pandas_edgelist(
-                    #     df, source="source", target="target", edge_attr="weight"
-                    # )
-                # df = df.set_index("source") 
+                # the code breaks with a newer version (pandas 1.2.2+?) due to a KeyError 'source' in L531
+                # G = nx.from_pandas_edgelist(
+                #     df, source="source", target="target", edge_attr="weight"
+                # )
+                # df = df.set_index("source")
 
                 # Optional: if threshold is specified
                 if threshold:
