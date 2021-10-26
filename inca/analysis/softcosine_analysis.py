@@ -482,7 +482,12 @@ class softcosine_similarity(Analysis):
                 df["target_date"] = df["target"].map(target_dict)
                 df["source_doctype"] = df["source"].map(source_dict2)
                 df["target_doctype"] = df["target"].map(target_dict2)
-                df = df.set_index("source")
+                # pandas version which was used to develop this code required df.set_index()
+                # the code breaks with a newer version (pandas 1.2.2+?) due to a KeyError 'source' in L529
+                    # G = nx.from_pandas_edgelist(
+                    #     df, source="source", target="target", edge_attr="weight"
+                    # )
+                # df = df.set_index("source") 
 
                 # Optional: if threshold is specified
                 if threshold:
