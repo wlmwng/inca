@@ -67,7 +67,7 @@ class softcosine_similarity(Analysis):
         source/target = doctype of source/target (can also be a list of multiple doctypes)
 
         sourcetext/targettext = field where text of target/source can be found (defaults to 'text')
-        sourcdate/targetedate = field where date of source/target can be found (defaults to 'publication_date')
+        sourcedate/targetdate = field where date of source/target can be found (defaults to 'publication_date')
         keyword_source/_target = optional: specify keywords that need to be present in the textfield; list or string (lowercase)
         keyword_source/_target_must = optional: In case of a list, do all keywords need to appear in the text (logical AND) or does at least one of the words need to be in the text (logical OR). Defaults to False (logical OR)
         condition_source/target = optional: supply the field and its value as a dict as a condition for analysis, e.g. {'topic':1} (defaults to None)
@@ -222,7 +222,8 @@ class softcosine_similarity(Analysis):
                 filter_below, filter_above * 100
             )
         )
-        dictionary.filter_extremes(no_below=filter_below, no_above=filter_above)
+        # don't drop tokens after 100,000 since rarer terms can add specificity for news event detection
+        dictionary.filter_extremes(no_below=filter_below, no_above=filter_above, keep_n=None, keep_n=None)
         logger.info("Preparing tfidf model")
         tfidf = TfidfModel(dictionary=dictionary)
         logger.info("Preparing soft cosine similarity matrix")
@@ -412,7 +413,7 @@ class softcosine_similarity(Analysis):
                             df.to_csv(
                                 os.path.join(
                                     destination,
-                                    r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{n_window}.csv".format(
+                                    r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{n_window}.csv".format(
                                         now=now,
                                         target=target,
                                         source=source,
@@ -425,7 +426,7 @@ class softcosine_similarity(Analysis):
                             df.to_pickle(
                                 os.path.join(
                                     destination,
-                                    r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{n_window}.pkl".format(
+                                    r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{n_window}.pkl".format(
                                         now=now,
                                         target=target,
                                         source=source,
@@ -481,7 +482,12 @@ class softcosine_similarity(Analysis):
                 df["target_date"] = df["target"].map(target_dict)
                 df["source_doctype"] = df["source"].map(source_dict2)
                 df["target_doctype"] = df["target"].map(target_dict2)
-                df = df.set_index("source")
+                # pandas version which was used to develop this code required df.set_index()
+                # the code breaks with a newer version (pandas 1.2.2+?) due to a KeyError 'source' in L529
+                    # G = nx.from_pandas_edgelist(
+                    #     df, source="source", target="target", edge_attr="weight"
+                    # )
+                # df = df.set_index("source") 
 
                 # Optional: if threshold is specified
                 if threshold:
@@ -496,7 +502,7 @@ class softcosine_similarity(Analysis):
                     df.to_csv(
                         os.path.join(
                             destination,
-                            r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.csv".format(
+                            r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.csv".format(
                                 now=now, target=target, source=source, i=i
                             ),
                         )
@@ -506,7 +512,7 @@ class softcosine_similarity(Analysis):
                     df.to_pickle(
                         os.path.join(
                             destination,
-                            r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.pkl".format(
+                            r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.pkl".format(
                                 now=now, target=target, source=source, i=i
                             ),
                         )
@@ -528,7 +534,7 @@ class softcosine_similarity(Analysis):
                         G,
                         os.path.join(
                             destination,
-                            r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.net".format(
+                            r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.net".format(
                                 now=now, target=target, source=source, i=i
                             ),
                         ),
