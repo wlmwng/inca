@@ -27,10 +27,10 @@ class missing_text_americanrenaissance(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
         text_is_generic = any(
             [
                 text
@@ -68,10 +68,10 @@ class missing_text_breitbart(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
 
         # evaluate the conditions
         missing_ind = any([text_is_empty])
@@ -100,10 +100,10 @@ class missing_text_dailycaller(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
 
         # evaluate the conditions
         missing_ind = any([text_is_empty])
@@ -132,10 +132,10 @@ class missing_text_dailystormer(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
         text_is_generic = any(
             [
                 text
@@ -171,10 +171,10 @@ class missing_text_foxnews(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
         text_is_generic = any(
             [
                 text
@@ -212,10 +212,10 @@ class missing_text_gatewaypundit(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
         text_is_generic = any(
             [
                 text
@@ -251,10 +251,10 @@ class missing_text_infowars(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
         text_is_generic = any(
             [
                 text
@@ -300,6 +300,7 @@ class missing_text_newsmax(Processer):
 
         logger.debug(f"text_is_empty: {text_is_empty}")
         logger.debug(f"missing_ind: {missing_ind}")
+
         return missing_ind
 
 
@@ -330,10 +331,10 @@ class missing_text_oneamericanews(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
         text_is_generic = any(
             [
                 text
@@ -384,10 +385,10 @@ class missing_text_rushlimbaugh(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
         text_is_date_only = self.is_date_only(text)
 
         # evaluate the conditions
@@ -418,10 +419,10 @@ class missing_text_seanhannity(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
 
         # evaluate the conditions
         missing_ind = any([text_is_empty])
@@ -450,10 +451,10 @@ class missing_text_vdare(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
 
         # evaluate the conditions
         missing_ind = any([text_is_empty])
@@ -482,10 +483,10 @@ class missing_text_washingtonexaminer(Processer):
         text = document_field
 
         # strip out ASCII/Unicode whitespaces
-        text = re.sub(r"\s+", "", text)
+        stripped_text = re.sub(r"\s+", "", text)
 
         # conditions for marking indicator as true
-        text_is_empty = True if len(text) == 0 else False
+        text_is_empty = True if len(stripped_text) == 0 else False
 
         # evaluate the conditions
         missing_ind = any([text_is_empty])
