@@ -43,6 +43,10 @@ class missing_text_americanrenaissance(Processer):
         # evaluate the conditions
         missing_ind = any([text_is_empty, text_is_generic])
 
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"text_is_generic: {text_is_generic}")
+        logger.debug(f"missing_ind: {missing_ind}")
+
         return missing_ind
 
 
@@ -72,6 +76,9 @@ class missing_text_breitbart(Processer):
         # evaluate the conditions
         missing_ind = any([text_is_empty])
 
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"missing_ind: {missing_ind}")
+
         return missing_ind
 
 
@@ -100,6 +107,9 @@ class missing_text_dailycaller(Processer):
 
         # evaluate the conditions
         missing_ind = any([text_is_empty])
+
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"missing_ind: {missing_ind}")
 
         return missing_ind
 
@@ -135,6 +145,10 @@ class missing_text_dailystormer(Processer):
 
         # evaluate the conditions
         missing_ind = any([text_is_empty, text_is_generic])
+
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"text_is_generic: {text_is_generic}")
+        logger.debug(f"missing_ind: {missing_ind}")
 
         return missing_ind
 
@@ -173,6 +187,10 @@ class missing_text_foxnews(Processer):
         # evaluate the conditions
         missing_ind = any([text_is_empty, text_is_generic])
 
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"text_is_generic: {text_is_generic}")
+        logger.debug(f"missing_ind: {missing_ind}")
+
         return missing_ind
 
 
@@ -207,6 +225,10 @@ class missing_text_gatewaypundit(Processer):
 
         # evaluate the conditions
         missing_ind = any([text_is_empty, text_is_generic])
+
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"text_is_generic: {text_is_generic}")
+        logger.debug(f"missing_ind: {missing_ind}")
 
         return missing_ind
 
@@ -243,6 +265,10 @@ class missing_text_infowars(Processer):
         # evaluate the conditions
         missing_ind = any([text_is_empty, text_is_generic])
 
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"text_is_generic: {text_is_generic}")
+        logger.debug(f"missing_ind: {missing_ind}")
+
         return missing_ind
 
 
@@ -272,6 +298,8 @@ class missing_text_newsmax(Processer):
         # evaluate the conditions
         missing_ind = any([text_is_empty])
 
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"missing_ind: {missing_ind}")
         return missing_ind
 
 
@@ -320,6 +348,12 @@ class missing_text_oneamericanews(Processer):
         missing_ind = any(
             [text_is_empty, text_is_generic, text_is_likely_unrelated_preview]
         )
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"text_is_generic: {text_is_generic}")
+        logger.debug(
+            f"text_is_likely_unrelated_preview: {text_is_likely_unrelated_preview}"
+        )
+        logger.debug(f"missing_ind: {missing_ind}")
 
         return missing_ind
 
@@ -359,6 +393,10 @@ class missing_text_rushlimbaugh(Processer):
         # evaluate the conditions
         missing_ind = any([text_is_empty, text_is_date_only])
 
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"text_is_date_only: {text_is_date_only}")
+        logger.debug(f"missing_ind: {missing_ind}")
+
         return missing_ind
 
 
@@ -387,6 +425,9 @@ class missing_text_seanhannity(Processer):
 
         # evaluate the conditions
         missing_ind = any([text_is_empty])
+
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"missing_ind: {missing_ind}")
 
         return missing_ind
 
@@ -417,6 +458,9 @@ class missing_text_vdare(Processer):
         # evaluate the conditions
         missing_ind = any([text_is_empty])
 
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"missing_ind: {missing_ind}")
+
         return missing_ind
 
 
@@ -445,5 +489,8 @@ class missing_text_washingtonexaminer(Processer):
 
         # evaluate the conditions
         missing_ind = any([text_is_empty])
+
+        logger.debug(f"text_is_empty: {text_is_empty}")
+        logger.debug(f"missing_ind: {missing_ind}")
 
         return missing_ind
