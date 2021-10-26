@@ -222,7 +222,8 @@ class softcosine_similarity(Analysis):
                 filter_below, filter_above * 100
             )
         )
-        dictionary.filter_extremes(no_below=filter_below, no_above=filter_above)
+        # don't drop tokens after 100,000 since rarer terms can add specificity for news event detection
+        dictionary.filter_extremes(no_below=filter_below, no_above=filter_above, keep_n=None, keep_n=None)
         logger.info("Preparing tfidf model")
         tfidf = TfidfModel(dictionary=dictionary)
         logger.info("Preparing soft cosine similarity matrix")
