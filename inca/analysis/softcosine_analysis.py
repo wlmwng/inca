@@ -412,7 +412,7 @@ class softcosine_similarity(Analysis):
                             df.to_csv(
                                 os.path.join(
                                     destination,
-                                    r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{n_window}.csv".format(
+                                    r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{n_window}.csv".format(
                                         now=now,
                                         target=target,
                                         source=source,
@@ -425,7 +425,7 @@ class softcosine_similarity(Analysis):
                             df.to_pickle(
                                 os.path.join(
                                     destination,
-                                    r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{n_window}.pkl".format(
+                                    r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{n_window}.pkl".format(
                                         now=now,
                                         target=target,
                                         source=source,
@@ -496,7 +496,7 @@ class softcosine_similarity(Analysis):
                     df.to_csv(
                         os.path.join(
                             destination,
-                            r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.csv".format(
+                            r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.csv".format(
                                 now=now, target=target, source=source, i=i
                             ),
                         )
@@ -506,7 +506,7 @@ class softcosine_similarity(Analysis):
                     df.to_pickle(
                         os.path.join(
                             destination,
-                            r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.pkl".format(
+                            r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.pkl".format(
                                 now=now, target=target, source=source, i=i
                             ),
                         )
@@ -528,7 +528,7 @@ class softcosine_similarity(Analysis):
                         G,
                         os.path.join(
                             destination,
-                            r"INCA_softcosine_{source}_{target}_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.net".format(
+                            r"INCA_softcosine_usrightmedia_{now.tm_year}_{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}_{now.tm_sec}_{i}.net".format(
                                 now=now, target=target, source=source, i=i
                             ),
                         ),
