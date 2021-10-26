@@ -67,7 +67,7 @@ class softcosine_similarity(Analysis):
         source/target = doctype of source/target (can also be a list of multiple doctypes)
 
         sourcetext/targettext = field where text of target/source can be found (defaults to 'text')
-        sourcdate/targetedate = field where date of source/target can be found (defaults to 'publication_date')
+        sourcedate/targetdate = field where date of source/target can be found (defaults to 'publication_date')
         keyword_source/_target = optional: specify keywords that need to be present in the textfield; list or string (lowercase)
         keyword_source/_target_must = optional: In case of a list, do all keywords need to appear in the text (logical AND) or does at least one of the words need to be in the text (logical OR). Defaults to False (logical OR)
         condition_source/target = optional: supply the field and its value as a dict as a condition for analysis, e.g. {'topic':1} (defaults to None)
