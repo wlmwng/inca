@@ -305,6 +305,7 @@ class missing_text_newsmax(Processer):
 
 
 class missing_text_oneamericanews(Processer):
+    @staticmethod
     def is_likely_unrelated_preview(text):  # redirects
         is_short = len(text) < 200
         is_preview = True if text.find("\nRead More") != -1 else False
@@ -360,6 +361,7 @@ class missing_text_oneamericanews(Processer):
 
 
 class missing_text_rushlimbaugh(Processer):
+    @staticmethod
     def is_date_only(text):
         try:
             datetime.strptime(text, "%b %d, %Y")
