@@ -2,16 +2,18 @@
 This file contains the twitter API retrieval classes
 """
 
-from ..core.client_class import Client, elasticsearch_required
-from ..core.basic_utils import dotkeys
-from twarc import Twarc2, expansions
-from requests import HTTPError
+import datetime
 import json
 import logging
-import datetime
+
+from requests import HTTPError
+from twarc import Twarc2, expansions
+
+from ..core.basic_utils import dotkeys
+from ..core.client_class import Client, elasticsearch_required
 from ..core.search_utils import doctype_first
 
-logger = logging.getLogger("INCA.%s" % __name__)
+logger = logging.getLogger(f"INCA.{__name__}")
 
 
 class twitter2(Client):
@@ -82,7 +84,7 @@ class twitter2(Client):
         Twitter API v2 using bearer token does not require this step, so just return credentials as-is.
         """
 
-        logger.info("Adding credentials to {appname}".format(**locals()))
+        logger.info(f"Adding credentials to {appname}")
         application = self.load_application(app=appname)
         credentials = dotkeys(application, "_source.credentials")
 
@@ -183,7 +185,7 @@ class twitter2_timeline(twitter2):
                 since_id = None
             else:
                 since_id = since_id[0].get("_source", {}).get("id", None)
-                logger.info("settings since_id to {since_id}".format(**locals()))
+                logger.info(f"settings since_id to {since_id}")
         try:
             # the search_all method calls the full-archive search endpoint
             # and returns a paginated generator
@@ -207,16 +209,12 @@ class twitter2_timeline(twitter2):
 
             for num, tweet in enumerate(tweets):
                 if self._check_exists(tweet["id"])[0] and not force:
-                    logger.info(
-                        "skipping existing {screen_name}-{tweet[id]}".format(**locals())
-                    )
+                    logger.info(f"skipping existing {screen_name}-{tweet['id']}")
                     continue
                 tweet["_id"] = tweet["id"]
                 if not (num + 1) % 100:
                     logger.info(
-                        "retrieved {num} tweets for {screen_name} with tweet_id = {tweet[_id]}".format(
-                            **locals()
-                        )
+                        f"retrieved {num} tweets for {screen_name} with tweet_id = {tweet['_id']}"
                     )
 
                 yield tweet
@@ -226,5 +224,5 @@ class twitter2_timeline(twitter2):
                 f"HTTP status code {err.response.status_code}: {err.response.text}"
             )
 
-        except Exception as e:
-            logger.error(f"Unhandled exception: {e}")
+        except Exception as err:
+            logger.error(f"Unhandled exception: {err}")
