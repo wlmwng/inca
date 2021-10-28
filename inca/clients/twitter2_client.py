@@ -160,8 +160,8 @@ class twitter2_timeline(twitter2):
             # rather than the id of T1 (oldest tweet, newest doc).
 
             # The account adds two tweets after June 15, 2020.
-            # At this time, the timeline contains T1, T2, T3, T4 (June 2), and T5 (June 5).
-            # doctype_first(...) sets 'since_id' set to the id of T3.
+            # At this time, the timeline contains T1, T2, T3, T4 (June 17), and T5 (June 20).
+            # doctype_first(...) sets 'since_id' to the id of T3.
             # As a result, only tweets posted after T3 (i.e., T5 and T4) are included in the response.
             # doctype_first(...) will then set 'since_id' to the id of T5 in a future retrieval.
 
