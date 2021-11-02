@@ -167,7 +167,7 @@ class Importer(BaseImportExport):
         return new_document
 
     def load(self):
-        """ To be implemented in subclasses
+        """To be implemented in subclasses
 
         normally called through the 'run' method. Please add to your documentation:
 
@@ -189,7 +189,7 @@ class Importer(BaseImportExport):
         yield document
 
     def run(self, mapping={}, *args, **kwargs):
-        """uses the documents from the load method in batches """
+        """uses the documents from the load method in batches"""
         self.processed = 0
         for batch in self._process_by_batch(self.load(*args, **kwargs)):
             batch = list(map(lambda doc: self._apply_mapping(doc, mapping), batch))
