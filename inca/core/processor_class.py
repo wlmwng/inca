@@ -13,8 +13,8 @@ yields a key:value pair per document, but does not need to return the old docume
 import logging
 from .document_class import Document
 from .database import get_document, update_document, check_exists, config
+import datetime
 
-# from . import *
 from inca import core
 
 from collections import OrderedDict
@@ -41,7 +41,7 @@ class Processer(Document):
         self.async_ = async_
 
     def _test_function(self):
-        """OVERWRITE THIS METHOD, should yield True (if it works) or False (if it doesn't) """
+        """OVERWRITE THIS METHOD, should yield True (if it works) or False (if it doesn't)"""
         return {self.__name__: {"status": False, "message": "UNKNOWN"}}
 
     def process(self, document_field, *args, **kwargs):
