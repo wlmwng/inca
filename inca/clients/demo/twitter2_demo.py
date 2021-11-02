@@ -6,8 +6,8 @@ from pprint import pprint
 
 from inca import Inca
 
-os.getcwd()
-os.chdir("./inca")
+# os.getcwd()
+# os.chdir("./inca")
 
 # get an instance of INCA
 myinca = Inca()
