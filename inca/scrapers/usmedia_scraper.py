@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import time
+import numpy as np
 
 import requests
 import urlexpander
@@ -150,7 +151,7 @@ class usmedia(Scraper):
             self.resolved_netloc = f['resolved_netloc']
             self.standardized_url = f['standardized_url']
             self.is_generic_url = f['is_generic_url']
-            self.response_code = f['response_code']
+            self.response_code = -1 if np.isnan(f['response_code']) else f['response_code']
             self.response_reason = f['response_reason']
             self.fetch_error = f['fetch_error']
             self.resolved_text = f['resolved_text']
