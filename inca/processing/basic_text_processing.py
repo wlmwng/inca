@@ -28,7 +28,7 @@ from sys import maxunicode
 class clean_whitespace(Processer):
     """Changes multiple whitespace to single whitespace"""
 
-    def process(self, document_field):
+    def process(self, document_field, **kwargs):
         """multiple whitespaces were folded to single whitespaces"""
         return re.sub(r"(\n\n|[ \t\n]|\r\n)([ \t\n\r\n])+", r"\1", document_field)
 
@@ -36,7 +36,7 @@ class clean_whitespace(Processer):
 class split_texts(Processer):
     """Splits text into a list of paragraphs"""
 
-    def process(self, document_field, split_values=["\r\n", "\n\n"]):
+    def process(self, document_field, split_values=["\r\n", "\n\n"], **kwargs):
         """Document was split into paragraphs"""
 
         doc = [document_field]
@@ -51,7 +51,7 @@ class split_texts(Processer):
 class njr(Processer):
     """Keeps only nouns (N), adjectives (J), and adverbs (R) (N, J, R are Penn Treebank tags)"""
 
-    def process(self, document_field):
+    def process(self, document_field, **kwargs):
         """everything except nouns, adjectives, and adverbs was removed"""
         doc = ""
         for sentence in parse(document_field).split():
@@ -102,7 +102,7 @@ class remove_punctuation(Processer):
     hyphen_dict = {i: " " for i in hyphen_codes}
     punc_dict.update(hyphen_dict)  # in-place
 
-    def process(self, document_field):
+    def process(self, document_field, **kwargs):
         """punctuation removed"""
         doc = document_field
         doc = doc.replace("`", "").replace("´", "")
@@ -114,7 +114,7 @@ class remove_punctuation(Processer):
 class lowercase(Processer):
     """converts to lowercase"""
 
-    def process(self, document_field):
+    def process(self, document_field, **kwargs):
         """converted to lowercase"""
         return document_field.lower()
 
@@ -203,7 +203,7 @@ class remove_stopwords(Processer):
     import requests
     stopwords = requests.get("https://raw.githubusercontent.com/stopwords-iso/stopwords-nl/master/stopwords-nl.txt").text.splitlines()"""
 
-    def process(self, document_field, stopwords):
+    def process(self, document_field, stopwords, **kwargs):
         """removes stopwords. `stopwords' can be either a language name ('dutch') or a list of stopwords"""
         supported_languages = [
             "arabic",
@@ -246,7 +246,7 @@ class remove_stopwords(Processer):
 class stemming(Processer):
     """Stems all the words in a document, based on nltk snowball stemming. Expects the keyword 'language' with the language  of the document as string as input, for example "dutch"."""
 
-    def process(self, document_field, language):
+    def process(self, document_field, language, **kwargs):
         from nltk.stem.snowball import SnowballStemmer
 
         stemmer = SnowballStemmer(language)
@@ -264,7 +264,7 @@ class lower_punct(Processer):
         i for i in range(maxunicode) if unicodedata.category(chr(i)).startswith("P")
     )
 
-    def process(self, document_field):
+    def process(self, document_field, **kwargs):
         return (
             document_field.replace("`", "")
             .replace("´", "")
@@ -276,7 +276,7 @@ class lower_punct(Processer):
 class remove_html_tags(Processer):
     """remove HTML tags"""
 
-    def process(self, document_field):
+    def process(self, document_field, **kwargs):
         """remove HTML tags"""
         soup = BeautifulSoup(document_field, "html.parser")
         doc = soup.get_text(separator=" ")

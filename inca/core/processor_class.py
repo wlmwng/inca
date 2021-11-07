@@ -57,17 +57,26 @@ class Processer(Document):
         force=False,
         action="run",
         *args,
-        **kwargs
+        **kwargs,
     ):
         """
-        Run a processor by supplying a list of documents, a query or a doctype .
+        Run a processor by supplying a list of documents, a query or a doctype.
         Actions specify the way in which the task should be run.
 
         Input
         ---
         docs_or_query:
             either a list of documents, an elasticsearch query or a string specifying the doctype
-        action: on of ['run','delay', 'batch' ]
+        action: on of ['run','delay', 'batch']
+            If action="batch", pass "bulksize" as a kwarg.
+            Example:
+            myinca.processing.remove_punctuation(
+                docs_or_query=doctype,
+                field="text",
+                save=True,
+                new_key="text_no_punct",
+                action="batch",
+                bulksize=bulksize)
 
         """
         documents = _doctype_query_or_list(docs_or_query, field=field, force=force)
@@ -86,11 +95,23 @@ class Processer(Document):
                 for placeholder in self.delay(doc, *args, **kwargs):
                     yield placeholder
         elif action == "batch":
+            for k, v in kwargs.items():
+                logger.info(f"key: {k}")
+                logger.info(f"value: {v}")
+            bulksize = kwargs.get("bulksize")
+            target_func = self
+            logger.info(f"target_func: {target_func}")
             for num, batch in enumerate(_batcher(documents, batchsize=bulksize)):
                 core.database.bulk_upsert().run(
                     documents=[
                         target_func.run(
-                            document=doc, field=field, force=force, *args, **kwargs
+                            document=doc,
+                            field=field,
+                            new_key=new_key,
+                            save=save,
+                            force=force,
+                            *args,
+                            **kwargs,
                         )
                         for doc in batch
                     ]
@@ -138,7 +159,6 @@ class Processer(Document):
         extra_fields: list
             (optional) list of fields that should be passed to the processor
         """
-
         # 1. check if document or id --> return do
         logger.debug("trying to process: ", document)
         masked = False  # expect a document to be processed as-is (assumes ES origin)
