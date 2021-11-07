@@ -14,10 +14,10 @@ class standardize_url(Processer):
         """standardize a URL
 
         Args:
-            document_field (str): the URL from the server
+            document_field (str): the URL scraped from the server
 
         Returns:
-            standardized_url (str): the
+            standardized_url (str): the URL standardized by urlExpander
 
         """
 
