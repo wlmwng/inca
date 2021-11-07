@@ -10,8 +10,8 @@ logger = logging.getLogger("INCA")
 
 
 class missing_text_americanrenaissance(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -51,8 +51,8 @@ class missing_text_americanrenaissance(Processer):
 
 
 class missing_text_breitbart(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -83,8 +83,8 @@ class missing_text_breitbart(Processer):
 
 
 class missing_text_dailycaller(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -115,8 +115,8 @@ class missing_text_dailycaller(Processer):
 
 
 class missing_text_dailystormer(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -154,8 +154,8 @@ class missing_text_dailystormer(Processer):
 
 
 class missing_text_foxnews(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -195,8 +195,8 @@ class missing_text_foxnews(Processer):
 
 
 class missing_text_gatewaypundit(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -234,8 +234,8 @@ class missing_text_gatewaypundit(Processer):
 
 
 class missing_text_infowars(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -273,8 +273,8 @@ class missing_text_infowars(Processer):
 
 
 class missing_text_newsmax(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -315,8 +315,8 @@ class missing_text_oneamericanews(Processer):
             ind = False
         return ind
 
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -370,8 +370,8 @@ class missing_text_rushlimbaugh(Processer):
             ind = False
         return ind
 
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -404,8 +404,8 @@ class missing_text_rushlimbaugh(Processer):
 
 
 class missing_text_seanhannity(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -436,8 +436,8 @@ class missing_text_seanhannity(Processer):
 
 
 class missing_text_vdare(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
@@ -468,8 +468,8 @@ class missing_text_vdare(Processer):
 
 
 class missing_text_washingtonexaminer(Processer):
-    def process(self, document_field):
-        """Check if the the scraped text is missing.
+    def process(self, document_field, **kwargs):
+        """Check if the scraped text is missing.
 
         This indicator is used as a filter before further analysis.
 
