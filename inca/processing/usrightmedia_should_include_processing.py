@@ -34,19 +34,21 @@ class should_include(Processer):
             - is_ap_syndicated   Media Cloud indicates that the article is likely AP press copy
             - is_fetch_error     urlExpander failed to retrieve the content for the target URL
             - is_generic_url     urlExpander indicates that the content is likely from a homepage
+            - is_empty_text      the text is an empty string
 
         Args:
-            document_field (str): e.g., the value of the "article_maintext_4_empty" key
-            extra_fields (list): ["ap_syndicated", "fetch_error", "is_generic_url"]
-
+            document_field (str): dummy field (not used by the processor)
+            extra_fields (list): ["ap_syndicated",
+                                  "fetch_error",
+                                  "is_generic_url",
+                                  "article_maintext_4_is_empty",
+                                  ]
 
         Returns:
             should_include (bool):
                 - this indicator should be written to the same new_key for all outlets' documents
 
         """
-
-        is_empty_text = document_field
 
         for k, v in kwargs["extra_fields"].items():
             if k == "ap_syndicated":
@@ -55,16 +57,18 @@ class should_include(Processer):
                 is_fetch_error = v
             elif k == "is_generic_url":
                 is_generic_url = v
+            elif k == "article_maintext_4_is_empty":
+                is_empty_text = v
 
-        if any([is_empty_text, is_ap_syndicated, is_fetch_error, is_generic_url, is_generic_text]):
+        if any([is_ap_syndicated, is_fetch_error, is_generic_url, is_empty_text]):
             should_include = False
         else:
             should_include = True
 
-        logger.info(f"is_empty_text: {is_empty_text}")
         logger.info(f"is_ap_syndicated: {is_ap_syndicated}")
         logger.info(f"is_fetch_error: {is_fetch_error}")
         logger.info(f"is_generic_url: {is_generic_url}")
+        logger.info(f"is_empty_text: {is_empty_text}")
         logger.info(f"should_include: {should_include}")
 
         return should_include
