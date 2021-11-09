@@ -1,23 +1,42 @@
 # -*- coding: utf-8 -*-
 import logging
-
+import re
 from ..core.processor_class import Processer
 
 logger = logging.getLogger("INCA")
 
+
+class is_empty_text(Processer):
+    def process(self, document_field, **kwargs):
+        """Check if the text field is empty.
+
+        Args:
+            document_field (str)
+
+        Returns:
+            is_empty_text (bool)
+
+        """
+        text = document_field
+
+        # strip out ASCII/Unicode whitespaces
+        stripped_text = re.sub(r"\s+", "", text)
+        is_empty_text = True if len(stripped_text) == 0 else False
+        logger.debug(f"is_empty_text: {is_empty_text}")
+        return is_empty_text
 
 class should_include(Processer):
     def process(self, document_field, **kwargs):
         """Indicate whether the document should be included for further analysis.
 
         If any of these boolean conditions is True, the document should be excluded.
-            - is_missing_text    added by processors in usrightmedia_missing_text_processing.py
+            - is_empty_text      the text is an empty string
             - is_ap_syndicated   Media Cloud indicates that the article is likely AP press copy
             - is_fetch_error     urlExpander failed to retrieve the content for the target URL
             - is_generic_url     urlExpander indicates that the content is likely from a homepage
 
         Args:
-            document_field (str): the value of the "article_maintext_*" key
+            document_field (str): e.g., the value of the "article_maintext_4_empty" key
             extra_fields (list): ["ap_syndicated", "fetch_error", "is_generic_url"]
 
 
@@ -27,7 +46,7 @@ class should_include(Processer):
 
         """
 
-        is_missing_text = document_field
+        is_empty_text = document_field
 
         for k, v in kwargs["extra_fields"].items():
             if k == "ap_syndicated":
@@ -37,12 +56,12 @@ class should_include(Processer):
             elif k == "is_generic_url":
                 is_generic_url = v
 
-        if any([is_missing_text, is_ap_syndicated, is_fetch_error, is_generic_url]):
+        if any([is_empty_text, is_ap_syndicated, is_fetch_error, is_generic_url, is_generic_text]):
             should_include = False
         else:
             should_include = True
 
-        logger.info(f"is_missing_text: {is_missing_text}")
+        logger.info(f"is_empty_text: {is_empty_text}")
         logger.info(f"is_ap_syndicated: {is_ap_syndicated}")
         logger.info(f"is_fetch_error: {is_fetch_error}")
         logger.info(f"is_generic_url: {is_generic_url}")
