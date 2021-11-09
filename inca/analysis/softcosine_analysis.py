@@ -317,7 +317,11 @@ class softcosine_similarity(Analysis):
                     grouped_query = grouped_query_new
 
                 # Sliding window starts here... How it works:
-                # A sliding window cuts the documents into groups that should be compared to each other based on their publication dates. A list of source documents published on the reference date is created. For each of the target dates in the window, the source list is compared to the targets, the information is put in a dataframe, and the dataframe is added to a list. This process is repeated for each window. We end up with a list of dataframes, which are eventually merged together into one dataframe.
+                # A sliding window cuts the documents into groups that should be compared to each other based on their publication dates.
+                # A list of source documents published on the reference date is created.
+                # For each of the target dates in the window, the source list is compared to the targets, the information is put in a dataframe,
+                # and the dataframe is added to a list. This process is repeated for each window.
+                # We end up with a list of dataframes, which are eventually merged together into one dataframe.
 
                 len_window = days_before + days_after + 1
                 source_pos = days_before  # source position is equivalent to days_before (e.g. 2 days before, means 3rd day is source with the index position [2])
