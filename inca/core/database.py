@@ -8,19 +8,22 @@ functionality provided here.
 """
 
 
-import logging
-import json
-import csv
-from elasticsearch import Elasticsearch, NotFoundError, helpers
-from elasticsearch.exceptions import ConnectionTimeout
-import time
-from datetime import datetime
 import configparser
+import csv
+import json
+import logging
+import os
+import time
+from datetime import MAXYEAR, datetime
+from hashlib import md5
+
+import pytz
 import requests
 from celery import Task
-import os
+from elasticsearch import Elasticsearch, NotFoundError, helpers
+from elasticsearch.exceptions import ConnectionTimeout
 from tqdm import tqdm
-from hashlib import md5
+
 from .filenames import id2filename
 
 config = configparser.ConfigParser()
@@ -169,7 +172,7 @@ def update_document(document, force=False, retry=0, max_retries=10):
 
 
 def delete_document(document_id):
-    """ delete a document
+    """delete a document
 
     Parameters
     ----
@@ -207,7 +210,7 @@ def delete_doctype(doctype):
 
 
 def insert_document(document, custom_identifier=""):
-    """ Insert a new document into the default index """
+    """Insert a new document into the default index"""
     document = _remove_dots(document)
 
     # Determine document type for Elasticsearch
@@ -249,7 +252,7 @@ def insert_document(document, custom_identifier=""):
 
 
 def insert_documents(documents, identifiers="id"):
-    """ Insert a batch of documents in ES
+    """Insert a batch of documents in ES
 
     Parameters
     ----
@@ -322,7 +325,7 @@ def insert_documents(documents, identifiers="id"):
 
 
 def update_or_insert_document(document, force=False, use_url=False):
-    """ Check whether a document exists, update if so
+    """Check whether a document exists, update if so
     use_url: if set to True it is additionally checked whether the url already exists. In case either only URL or only id exists the document is not inserted"""
     if "_id" in document.keys():
         exists, _document = check_exists(document["_id"])
@@ -393,8 +396,8 @@ def remove_field(query, field):
 
 class bulk_upsert(Task):
     """Processers can generate far more updates than elasticsearch wants to handle.
-       Bulk_upsert reduces the load on elasticsearch by enabeling multiple documents
-       to be updated together, reducing the amount of queries.
+    Bulk_upsert reduces the load on elasticsearch by enabeling multiple documents
+    to be updated together, reducing the amount of queries.
     """
 
     def run(self, documents):
@@ -403,7 +406,7 @@ class bulk_upsert(Task):
 
 
 def _remove_dots(document):
-    """ elasticsearch is allergic to dots like '.' in keys.
+    """elasticsearch is allergic to dots like '.' in keys.
     if you're not careful, it may choke!
     """
     for k, v in document.items():
@@ -495,10 +498,10 @@ def create_repository(location):
     -----
     The repository location must match the `path.repo` argument in the
     `elasticsearch.yml` file, generally located in the .../elasticsearch/config
-    path or, alternatively, in the /etc/elasticsearch path. Elasticsearch must be restarted 
-    after the `path.repo` is set or changed. In case you are having trouble with 
-    starting elasticsearch again, run 
-    
+    path or, alternatively, in the /etc/elasticsearch path. Elasticsearch must be restarted
+    after the `path.repo` is set or changed. In case you are having trouble with
+    starting elasticsearch again, run
+
     ```bash
     sudo chown elasticsearch.elasticsearch /path/to/inca/backup
     ```
@@ -591,18 +594,42 @@ def restore_backup(name):
 
 
 def deduplicate(
-    g, dryrun=True, check_keys=["text", "title", "doctype", "publication_date"]
+    g,
+    action="return",
+    check_keys=["text", "doctype"],
+    extra_keys=["title", "url", "resolved_url"],
+    date_field="publish_date",
 ):
     """
-    Takes a document generator `g` as input and lists (if `dryrun=True`)
-    or remove (if `dryrun=False`) duplicate documents. 
-    With ```check_keys = ['key1', 'key2', ...] ``` you can specify the keys
-    on which the documents are compared.
+
+    Args:
+        g (document generator)
+        action (str):
+            "return": Return all IDs of duplicate-related documents.
+                      This includes the ID of the very first doc, which the other docs are a duplicate of.
+            "dryrun": Print duplicate documents.
+            "delete": Remove duplicate documents.
+        check_keys (list): Specify the keys on which the documents are compared.
+                           The keys are returned for each doc when "action=return".
+        extra_keys (list): Additional keys to return for each doc when "action=return".
+        date_field (string): The key storing the date information;
+                             Used for sorting when action="return"
+                             e.g., '2016-01-25T16:16:25+00:00'
+
+    Returns (if action="return"):
+        list_of_duped_hashvals (list of dicts):
+            Each dict has a "hashval" key which contains a list of documents.
+            The documents are trimmed down to return the specified keys from check_keys and extra_keys.
+                {"hashval": [{_id:..., key1:...},
+                             {_id:..., key1:...}},
+                            ]
+                }
+            The documents are sorted by field_date, from oldest to newest.
 
     Example usage:
     ```
     g = myinca.database.doctype_generator('nu')
-    myinca.database.deduplicate('nu', dryrun = True)
+    myinca.database.deduplicate(g, action = "dryrun")
     ```
 
     Functionality inspired by https://www.elastic.co/blog/how-to-find-and-remove-duplicate-documents-in-elasticsearch
@@ -620,11 +647,55 @@ def deduplicate(
     # Search through the hash of doc values to see if any
     # duplicate hashes have been found
     numdups = 0
-    if dryrun:
+
+    if action == "return":
+        list_of_duped_hashvals = []
+        for hashval, array_of_ids in dict_of_duplicate_docs.items():
+            # If array_of_ids only contains one ID, there is no duplicate.
+            if len(array_of_ids) > 1:
+                logger.info(f"********** Duplicate docs hash={hashval} **********")
+                # Get the documents that have mapped to the current hashval
+                matching_docs = client.mget(
+                    index=elastic_index, doc_type="doc", body={"ids": array_of_ids}
+                )
+
+                dupe_docs = []
+                return_keys = list(set(check_keys + extra_keys))
+                for doc in matching_docs["docs"]:
+                    dict_doc = {}
+                    dict_doc["_id"] = doc["_id"]
+                    for mykey in return_keys:
+                        dict_doc[mykey] = doc["_source"].get(mykey, None)
+                    # if a document doesn't have a datetime available,
+                    # it is assigned a dummy date with MAXYEAR
+                    # so that it gets sorted to end of the returned list
+                    dict_doc[date_field] = doc["_source"].get(
+                        date_field,
+                        datetime(MAXYEAR, 1, 1, 0, 0, 0, 0)
+                        .replace(tzinfo=pytz.utc)
+                        .isoformat(),
+                    )
+                    dupe_docs.append(dict_doc)
+                # sort the documents per hashval from oldest to newest date
+                dupe_docs = sorted(
+                    dupe_docs,
+                    reverse=False,
+                    key=lambda k: datetime.fromisoformat(k[date_field]),
+                )
+                list_of_duped_hashvals.append((hashval, dupe_docs))
+
+        # sort the hashed values based on the number of associated documents
+        list_of_duped_hashvals = sorted(
+            list_of_duped_hashvals, reverse=True, key=lambda t: len(t[1])
+        )
+
+        return list_of_duped_hashvals
+
+    elif action == "dryrun":
         for hashval, array_of_ids in dict_of_duplicate_docs.items():
             id_to_keep = array_of_ids.pop(0)  # let's always keep the first doc
             if len(array_of_ids) > 0:
-                # print("********** Duplicate docs hash=%s **********" % hashval)
+                logger.info(f"********** Duplicate docs hash={hashval} **********")
                 # Get the documents that have mapped to the current hashval
                 matching_docs = client.mget(
                     index=elastic_index, doc_type="doc", body={"ids": array_of_ids}
@@ -632,22 +703,15 @@ def deduplicate(
 
                 for doc in matching_docs["docs"]:
                     numdups += 1
-                    try:
-                        print(
-                            "{}\t{}\t{}".format(
-                                doc["_source"].get("title", " " * 20)[:20],
-                                doc["_source"].get("text", " " * 20)[:20],
-                                doc["_source"].get("publication_date", " " * 10),
-                            )
-                        )
-                    except:
-                        pass
+                    print.info(f"_id: {doc['_id']}")
+                    for mykey in check_keys:
+                        print.info(f"{mykey}: {doc['_source'].get(mykey, ' '*20)}")
+
         print(
-            "\nUse a fresh generator and run again with `dryrun=False` to remove these {} documents".format(
-                numdups
-            )
+            f"\nUse a fresh generator and run again with `dryrun=False` to remove these {numdups} documents"
         )
-    else:
+
+    elif action == "delete":
         deleted = 0
         to_delete = sum(
             [len(array_of_ids) - 1 for array_of_ids in dict_of_duplicate_docs.values()]
@@ -677,7 +741,7 @@ def reparse(g, f, force=False):
     """
     Takes a document generator `g` as reparses the `htmlsource` key using
     a parse function f taken from an INCA-scraper.
-  
+
     In the current implementation, only the text field is considered.
     By default, the text field is only updated if it was empty.
 
@@ -688,8 +752,8 @@ def reparse(g, f, force=False):
     Example usage:
     ```
     from inca.rssscrapers import news_scraper
-    f = news_scraper.nu.parsehtml 
-   
+    f = news_scraper.nu.parsehtml
+
     g = myinca.database.document_generator('doctype:"nu" AND publication_date:[2017-01-01 TO 2017-03-15]')
     myinca.database.reparse(g, f, force = False)
     ```
