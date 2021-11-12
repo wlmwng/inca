@@ -53,16 +53,19 @@ class is_empty_text(Processer):
         logger.debug(f"is_empty_text: {is_empty_text}")
         return is_empty_text
 
+
 class should_include(Processer):
     def process(self, document_field, **kwargs):
         """Indicate whether the document should be included for further analysis.
 
         If any of these boolean conditions is True, the document should be excluded.
-            - is_empty_text      the text is an empty string
-            - is_ap_syndicated   Media Cloud indicates that the article is likely AP press copy
-            - is_fetch_error     urlExpander failed to retrieve the content for the target URL
-            - is_generic_url     urlExpander indicates that the content is likely from a homepage
-            - is_empty_text      the text is an empty string
+            - is_ap_syndicated          Media Cloud indicates that the article is likely AP press copy
+            - is_fetch_error            urlExpander failed to retrieve the content for the target URL
+            - is_generic_url            urlExpander indicates that the content is likely from a homepage
+            - is_empty_text             the text is an empty string
+            - is_valid_dupe_text        the text is a duplicate of an older article by the same outlet
+            - is_generic_dupe_text      the text is likely generic boilerplate text
+            - is_misc_dupe_text         the text is a duplicate, but it's uncertain if it's a "valid" or "generic" dupe
 
         Args:
             document_field (str): dummy field (not used by the processor)
@@ -70,6 +73,9 @@ class should_include(Processer):
                                   "fetch_error",
                                   "is_generic_url",
                                   "article_maintext_4_is_empty",
+                                  "article_maintext_4_is_valid_dupe",
+                                  "article_maintext_4_is_generic_dupe"
+                                  "article_maintext_4_is_misc_dupe",
                                   ]
 
         Returns:
@@ -87,8 +93,24 @@ class should_include(Processer):
                 is_generic_url = v
             elif k == "article_maintext_4_is_empty":
                 is_empty_text = v
+            elif k == "article_maintext_4_is_valid_dupe":
+                is_valid_dupe_text = v
+            elif k == "article_maintext_4_is_generic_dupe":
+                is_generic_dupe_text = v
+            elif k == "article_maintext_4_is_misc_dupe":
+                is_misc_dupe_text = v
 
-        if any([is_ap_syndicated, is_fetch_error, is_generic_url, is_empty_text]):
+        if any(
+            [
+                is_ap_syndicated,
+                is_fetch_error,
+                is_generic_url,
+                is_empty_text,
+                is_valid_dupe_text,
+                is_generic_dupe_text,
+                is_misc_dupe_text,
+            ]
+        ):
             should_include = False
         else:
             should_include = True
@@ -97,6 +119,9 @@ class should_include(Processer):
         logger.info(f"is_fetch_error: {is_fetch_error}")
         logger.info(f"is_generic_url: {is_generic_url}")
         logger.info(f"is_empty_text: {is_empty_text}")
+        logger.info(f"is_valid_dupe_text: {is_valid_dupe_text}")
+        logger.info(f"is_generic_dupe_text: {is_generic_dupe_text}")
+        logger.info(f"is_misc_dupe_text: {is_misc_dupe_text}")
         logger.info(f"should_include: {should_include}")
 
         return should_include
