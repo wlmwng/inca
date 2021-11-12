@@ -6,6 +6,34 @@ from ..core.processor_class import Processer
 logger = logging.getLogger("INCA")
 
 
+class is_true_ind(Processer):
+    def process(self, document_field, **kwargs):
+        """Set the new_key value to True.
+
+        Args:
+            document_field (str): not used
+
+        Returns:
+            True
+
+        """
+        return True
+
+
+class is_false_ind(Processer):
+    def process(self, document_field, **kwargs):
+        """Set the new_key value to False.
+
+        Args:
+            document_field (str): not used
+
+        Returns:
+            False
+
+        """
+        return False
+
+
 class is_empty_text(Processer):
     def process(self, document_field, **kwargs):
         """Check if the text field is empty.
