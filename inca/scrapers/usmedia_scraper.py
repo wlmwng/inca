@@ -29,7 +29,7 @@ class usmedia(Scraper):
         hydrate:            fill out the remaining attrs based on the retrieved content.
         json_serializeable: prep the content to produce a document ready to be stored in Elasticsearch.
         get:                required by INCA's internal logic to make the scraper available publicly.
-        
+
         """
 
         def __init__(self, url_info):
@@ -43,46 +43,45 @@ class usmedia(Scraper):
             self._id = f"{d['outlet'].replace(' ', '')}_{d['url_id']}"
 
             # add fields from Media Cloud
-            self.url_id = d['url_id'] # same as story id
-            self.outlet = d['outlet']
-            self.publish_date = d['publish_date'] # already converted to UTC
-            self.title = d['title']
-            self.ap_syndicated = d['ap_syndicated']
-            self.themes = d['themes']
+            self.url_id = d["url_id"]  # same as story id
+            self.outlet = d["outlet"]
+            self.publish_date = d["publish_date"]  # already converted to UTC
+            self.title = d["title"]
+            self.ap_syndicated = d["ap_syndicated"]
+            self.themes = d["themes"]
 
             # used for fetching
-            self.url = d['url']
-            self.alt_url = d['alt_url']
+            self.url = d["url"]
+            self.alt_url = d["alt_url"]
 
             # hydrated by fetched response
             # dummy values are necessary because Elasticsearch mapping expects certain types
             # RequestError: RequestError(400, 'mapper_parsing_exception',
             # "failed to parse field [FETCH_AT] of type [date] in document with id 'dailycaller_567'")
-            self.article_maintext = ''
-            self.article_maintext_is_empty = True # for Kibana
-            self.original_url = ''
-            self.resolved_url = ''
-            self.resolved_domain = ''
-            self.resolved_netloc = ''
-            self.standardized_url = ''
+            self.article_maintext = ""
+            self.article_maintext_is_empty = True  # for Kibana
+            self.original_url = ""
+            self.resolved_url = ""
+            self.resolved_domain = ""
+            self.resolved_netloc = ""
+            self.standardized_url = ""
             self.is_generic_url = False
             self.response_code = -1
-            self.response_reason = ''
+            self.response_reason = ""
             self.fetch_error = True
-            self.FETCH_FUNCTION = 'Fetch failed to start'
-            self.FETCH_AT = '1900-01-01T00:00:00.000000'
+            self.FETCH_FUNCTION = "Fetch failed to start"
+            self.FETCH_AT = "1900-01-01T00:00:00.000000"
 
             # how many secs it took to create the doc
-            self.TIME_TAKEN = ''
-            self.RETRIEVAL_MSG = ''
+            self.TIME_TAKEN = ""
+            self.RETRIEVAL_MSG = ""
 
             # since HTML is lengthy, put it at the end of the obj for readability
-            self.resolved_text = ''
-
+            self.resolved_text = ""
 
         def retrieve_content(self):
             """retrieve the URL's webpage content.
-            
+
             Try to fetch with 'self.url' first. If it fails, try to fetch with 'self.alt_url'.
 
             urlexpander.fetch_url():
@@ -96,7 +95,7 @@ class usmedia(Scraper):
                 f1 = json.loads(f1)
                 fetched = f1
 
-                f1_error = f1['fetch_error'] # bool
+                f1_error = f1["fetch_error"]  # bool
                 self.RETRIEVAL_MSG = f"fetch_error (url): {f1_error}"
 
                 logger.info(f"completed retrieval with primary URL")
@@ -114,14 +113,16 @@ class usmedia(Scraper):
                 self.RETRIEVAL_MSG = f"fetch_error (url): {f1_error}, {str(e)}"
 
             if f1_error:
-                logger.info(f"failed to retrieve with primary URL, trying alternative URL")
+                logger.info(
+                    f"failed to retrieve with primary URL, trying alternative URL"
+                )
 
                 try:
                     f2 = urlexpander.fetch_url(self.alt_url)
                     f2 = json.loads(f2)
                     fetched = f2
 
-                    f2_error = f2['fetch_error']
+                    f2_error = f2["fetch_error"]
                     self.RETRIEVAL_MSG = f"fetch_error (alt_url): {f2_error}"
                     logger.info(f"completed retrieval with alternative URL")
 
@@ -137,26 +138,39 @@ class usmedia(Scraper):
                 self.hydrate(fetched)
 
             except UnboundLocalError as e:
-                logger.warning(f"Failed to retrieve url_id {self.url_id} with url {self.url} and alt_url {self.alt_url}")
+                logger.warning(
+                    f"Failed to retrieve url_id {self.url_id} with url {self.url} and alt_url {self.alt_url}"
+                )
             return self
 
         def hydrate(self, fetched):
             """update the NewsContent instance with the fetched info"""
             f = fetched
-            self.article_maintext = "" if f['article_maintext'] is None else f['article_maintext']
-            self.article_maintext_is_empty = False if len(self.article_maintext) > 0 else True
-            self.original_url = f['original_url']
-            self.resolved_url = f['resolved_url']
-            self.resolved_domain = f['resolved_domain']
-            self.resolved_netloc = f['resolved_netloc']
-            self.standardized_url = f['standardized_url']
-            self.is_generic_url = f['is_generic_url']
-            self.response_code = -1 if np.isnan(f['response_code']) else f['response_code']
-            self.response_reason = f['response_reason']
-            self.fetch_error = f['fetch_error']
-            self.resolved_text = f['resolved_text']
-            self.FETCH_FUNCTION = f['FETCH_FUNCTION']
-            self.FETCH_AT = f['FETCH_AT']
+            self.article_maintext = (
+                "" if f["article_maintext"] is None else f["article_maintext"]
+            )
+            self.article_maintext_is_empty = (
+                False if len(self.article_maintext) > 0 else True
+            )
+            self.original_url = f["original_url"]
+            self.resolved_url = f["resolved_url"]
+            self.resolved_domain = f["resolved_domain"]
+            self.resolved_netloc = f["resolved_netloc"]
+            self.standardized_url = f["standardized_url"]
+            self.is_generic_url = f["is_generic_url"]
+            try:
+                self.response_code = (
+                    -1 if np.isnan(f["response_code"]) else int(f["response_code"])
+                )
+            except TypeError:
+                # HTTP response codes should be numeric
+                # the server didn't return a numeric value
+                self.response_code = -1
+            self.response_reason = f["response_reason"]
+            self.fetch_error = f["fetch_error"]
+            self.resolved_text = f["resolved_text"]
+            self.FETCH_FUNCTION = f["FETCH_FUNCTION"]
+            self.FETCH_AT = f["FETCH_AT"]
 
         def json_serializeable(self):
             """Convert values which are not JSON-serializable by default"""
@@ -179,7 +193,7 @@ class usmedia(Scraper):
                         return json.dumps(o)
                     elif o is None:
                         return ""
-                    
+
                     return json.JSONEncoder.default(self, o)
 
             content = self.__dict__
@@ -200,7 +214,7 @@ class usmedia(Scraper):
         init = self.NewsContent(url_info=url_info)
         content = init.retrieve_content()
         t1 = time.time()
-        content.TIME_TAKEN = t1-t0
+        content.TIME_TAKEN = t1 - t0
         content.resolved_text = ""
         doc = content.json_serializeable()
 
