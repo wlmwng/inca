@@ -16,9 +16,7 @@ class match_outlet_articles_to_tweets2_urls(Processer):
         Only documents from outlets should use this processor.
 
         Args:
-            document_field (str): value of "standardized_url_2" key; outlet URL to find matches for among (re-)tweeted URL docs.
-                                  "standardized_url_2" used the public fork of urlExpander.
-                                  "standardized_url" used a dev version of urlExpander which is outdated.
+            document_field (str): value of "standardized_url" key; outlet URL to find matches for among (re-)tweeted URL docs.
 
         Returns:
             matched_ids (list): [] or [matched_id_1, matched_id_2, ... ]; stored in new_key "tweets2_url_ids"
@@ -48,13 +46,13 @@ class match_outlet_articles_to_tweets2_urls(Processer):
         logger.info(f"url to match: {url_to_match}")
 
         search_param = {
-            "_source": ["_id", "standardized_url_2"],
+            "_source": ["_id", "standardized_url"],
             "size": 10000,
             "query": {
                 "bool": {
                     "filter": [
                         {"term": {"doctype": "tweets2_url"}},
-                        {"term": {"standardized_url_2.keyword": url_to_match}},
+                        {"term": {"standardized_url.keyword": url_to_match}},
                     ]
                 }
             },
