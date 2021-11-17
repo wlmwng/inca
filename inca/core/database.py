@@ -405,6 +405,19 @@ class bulk_upsert(Task):
         return helpers.bulk(client, documents)
 
 
+def batcher(stuff, batchsize=10):
+    batch = []
+    for num, thing in enumerate(stuff):
+        batch.append(thing)
+        if (num + 1) % batchsize == 0:
+            logger.debug("processing batch %s" % (num + 1))
+            yield_batch = batch
+            batch = []
+            yield yield_batch
+    if batch:
+        yield batch
+
+
 def _remove_dots(document):
     """elasticsearch is allergic to dots like '.' in keys.
     if you're not careful, it may choke!
