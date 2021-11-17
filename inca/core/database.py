@@ -12,6 +12,7 @@ import configparser
 import csv
 import json
 import logging
+import math
 import os
 import time
 from datetime import MAXYEAR, datetime
@@ -169,6 +170,51 @@ def update_document(document, force=False, retry=0, max_retries=10):
         )
         insert_document(document)
     pass
+
+
+def update_documents(documents, batchsize=50):
+    """Update a batch of documents in ES.
+
+    Parameters
+    ----
+    documents : list
+        a list of document dictionaries to be inserted
+
+        {'_id': <the _id of the doc to update>,
+        'new_field_1': 'new_value_1',
+        'new_field_2': 'new_value_2'}
+
+    batchsize: int
+        number of documents to update per HTTP request to Elasticsearch
+
+    Returns
+    ----
+    None
+
+    Notes
+    ----
+    https://elasticsearch-py.readthedocs.io/en/6.8.2/helpers.html
+    https://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-update.html#_updates_with_a_partial_document
+
+    """
+
+    actions = []
+    for doc in documents:
+        action = {
+            "_op_type": "update",
+            "_index": elastic_index,
+            "_type": "doc",
+            "_id": doc["_id"],
+        }
+        doc.pop("_id")
+        action.update({"doc": doc})
+        actions.append(action)
+
+    batches = batcher(actions, batchsize=batchsize)
+    len_batches = math.ceil(len(actions) / batchsize)
+    for num, batch in enumerate(tqdm(batches, total=len_batches)):
+        bulk_upsert().run(documents=batch)
+        logger.info(f"processed batch {num} {datetime.now()}")
 
 
 def delete_document(document_id):
@@ -396,7 +442,7 @@ def remove_field(query, field):
 
 class bulk_upsert(Task):
     """Processers can generate far more updates than elasticsearch wants to handle.
-    Bulk_upsert reduces the load on elasticsearch by enabeling multiple documents
+    Bulk_upsert reduces the load on elasticsearch by enabling multiple documents
     to be updated together, reducing the amount of queries.
     """
 
