@@ -12,7 +12,7 @@ yields a key:value pair per document, but does not need to return the old docume
 
 import logging
 from .document_class import Document
-from .database import get_document, update_document, check_exists, config
+from .database import get_document, update_document, check_exists, config, batcher
 import datetime
 
 from inca import core
@@ -101,7 +101,7 @@ class Processer(Document):
             bulksize = kwargs.get("bulksize")
             target_func = self
             logger.info(f"target_func: {target_func}")
-            for num, batch in enumerate(_batcher(documents, batchsize=bulksize)):
+            for num, batch in enumerate(batcher(documents, batchsize=bulksize)):
                 core.database.bulk_upsert().run(
                     documents=[
                         target_func.run(
@@ -121,7 +121,7 @@ class Processer(Document):
                 yield batch
 
         elif action == "celery_batch":
-            for batch in _batcher(documents, batchsize=bulksize):
+            for batch in batcher(documents, batchsize=bulksize):
                 if not batch:
                     continue  # ignore empty batches
                 batch_tasks = [
@@ -304,16 +304,3 @@ def _doctype_query_or_list(doctype_query_or_list, force=False, field=None, task=
             doctype_query_or_list.update({"query": {"missing": {"field": field}}})
         documents = core.database.scroll_query(doctype_query_or_list)
     return documents
-
-
-def _batcher(stuff, batchsize=10):
-    batch = []
-    for num, thing in enumerate(stuff):
-        batch.append(thing)
-        if (num + 1) % batchsize == 0:
-            logger.debug("processing batch %s" % (num + 1))
-            yield_batch = batch
-            batch = []
-            yield yield_batch
-    if batch:
-        yield batch

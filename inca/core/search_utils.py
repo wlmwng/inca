@@ -13,7 +13,8 @@ from .database import (
     insert_document,
     insert_documents,
     update_document,
-    remove_field
+    update_documents,
+    remove_field,
 )
 from .database import deduplicate, reparse
 import logging as _logging
