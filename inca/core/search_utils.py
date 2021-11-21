@@ -15,6 +15,7 @@ from .database import (
     update_document,
     update_documents,
     remove_field,
+    scroll_query
 )
 from .database import deduplicate, reparse
 import logging as _logging
