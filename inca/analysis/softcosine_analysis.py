@@ -198,11 +198,13 @@ class softcosine_similarity(Analysis):
         target_query = scroll_query(target_query)
 
         # Make generators into lists and filter out those who do not have the specified keys (preventing KeyError)
+        logger.info("Collecting target documents")
         target_query = [
             a
             for a in target_query
             if targettext in a["_source"].keys() and targetdate in a["_source"].keys()
         ]
+        logger.info("Collecting source documents")
         source_query = [
             a
             for a in source_query
@@ -224,6 +226,7 @@ class softcosine_similarity(Analysis):
                 filter_below, filter_above * 100
             )
         )
+
         # don't drop tokens after 100,000 since rarer terms can add specificity for news event detection
         dictionary.filter_extremes(
             no_below=filter_below, no_above=filter_above, keep_n=None, keep_tokens=None
