@@ -227,9 +227,8 @@ class softcosine_similarity(Analysis):
             )
         )
 
-        # don't drop tokens after 100,000 since rarer terms can add specificity for news event detection
         dictionary.filter_extremes(
-            no_below=filter_below, no_above=filter_above, keep_n=None, keep_tokens=None
+            no_below=filter_below, no_above=filter_above, keep_n=100000, keep_tokens=None
         )
         logger.info("Preparing tfidf model")
         tfidf = TfidfModel(dictionary=dictionary)
